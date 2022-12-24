@@ -46,7 +46,7 @@ func UpdateUser(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, "Failed to fetch user")
 	}
 
-	if usr.Type == model.UserTypeClient && user.ID != uint(uid) {
+	if usr.Type == model.UserTypeClient && usr.ID != uint(uid) {
 		return c.NoContent(http.StatusUnauthorized)
 	}
 
