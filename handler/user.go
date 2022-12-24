@@ -33,6 +33,23 @@ func UpdateUser(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "Invalid user format")
 	}
 
+	// get the user id from header
+	usrID := c.Request().Header.Get("UserID")
+	uid, err := strconv.Atoi(usrID)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "Failed to parse user ID")
+	}
+
+	// check if the user is authorized to fetch user
+	usr, err := db.GetUser(uint64(uid))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, "Failed to fetch user")
+	}
+
+	if usr.Type == model.UserTypeClient && user.ID != uint(uid) {
+		return c.NoContent(http.StatusUnauthorized)
+	}
+
 	user, err = db.UpdateUser(user)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, "Failed to update user")
